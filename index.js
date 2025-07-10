@@ -1,7 +1,20 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const axios = require("axios");
+
+const app = express();
+app.use(bodyParser.json());
+
+const LINE_ACCESS_TOKEN = process.env.LINE_ACCESS_TOKEN;
+const GPTS_ACTION_URL = process.env.GPTS_ACTION_URL;
+
+if (!LINE_ACCESS_TOKEN) console.warn("⚠ LINE_ACCESS_TOKEN が未定義です");
+if (!GPTS_ACTION_URL) console.warn("⚠ GPTS_ACTION_URL が未定義です");
+
 app.post("/webhook", async (req, res) => {
   const events = req.body.events;
   if (!events || !Array.isArray(events)) {
-    return res.sendStatus(200); // 空イベントは何もせず返す
+    return res.sendStatus(200);
   }
 
   for (const event of events) {
@@ -26,7 +39,7 @@ app.post("/webhook", async (req, res) => {
             headers: {
               Authorization: `Bearer ${LINE_ACCESS_TOKEN}`,
               "Content-Type": "application/json",
-            }
+            },
           }
         );
       } catch (error) {
@@ -37,3 +50,8 @@ app.post("/webhook", async (req, res) => {
 
   res.sendStatus(200);
 });
+
+app.get("/", (req, res) => res.send("LINE GPT Bot is running"));
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Listening on ${port}`));
