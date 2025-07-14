@@ -11,6 +11,7 @@ const GPTS_ACTION_URL = process.env.GPTS_ACTION_URL;
 if (!LINE_ACCESS_TOKEN) console.warn("⚠ LINE_ACCESS_TOKEN が未定義です");
 if (!GPTS_ACTION_URL) console.warn("⚠ GPTS_ACTION_URL が未定義です");
 
+// ✅ LINEのWebhookエンドポイント
 app.post("/webhook", async (req, res) => {
   const events = req.body.events;
   if (!events || !Array.isArray(events)) {
@@ -43,15 +44,4 @@ app.post("/webhook", async (req, res) => {
           }
         );
       } catch (error) {
-        console.error("エラー:", error.response?.data || error.message);
-      }
-    }
-  }
-
-  res.sendStatus(200);
-});
-
-app.get("/", (req, res) => res.send("LINE GPT Bot is running"));
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on ${port}`));
+        console.error("エラー:", error.response?.data || error.mes
