@@ -22,4 +22,50 @@ app.post("/webhook", async (req, res) => {
     if (event.type === "message" && event.message.type === "text") {
       const userMessage = event.message.text;
 
-      try
+      try {
+        const gptRes = await axios.post(GPTS_ACTION_URL, {
+          message: userMessage,
+          userId: event.source.userId,
+        });
+
+        const reply = gptRes.data.reply || "すみません、うまく返せませんでした。";
+
+        await axios.post(
+          "https://api.line.me/v2/bot/message/reply",
+          {
+            replyToken: event.replyToken,
+            messages: [{ type: "text", text: reply }],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${LINE_ACCESS_TOKEN}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (error) {
+        console.error("エラー:", error.response?.data || error.message);
+      }
+    }
+  }
+
+  res.sendStatus(200);
+});
+
+// ✅ GPTsのActionsから呼ばれるPOST /
+app.post("/", async (req, res) => {
+  try {
+    const { message, userId } = req.body;
+
+    if (!message || !userId) {
+      console.error("Missing message or userId in request body:", req.body);
+      return res.status(400).json({ error: "Missing message or userId" });
+    }
+
+    const reply = `こんにちは ${userId} さん。「${message}」と受け取りました。`;
+
+    res.json({ reply });
+  } catch (err) {
+    console.error("POST / でのエラー:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
