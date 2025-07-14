@@ -69,3 +69,10 @@ app.post("/", async (req, res) => {
     console.error("POST / でのエラー:", err);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+// ✅ 動作確認用
+app.get("/", (req, res) => res.send("LINE GPT Bot is running"));
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Listening on ${port}`));
